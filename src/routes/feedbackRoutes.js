@@ -19,21 +19,18 @@ router.post(
         return res.status(400).json({ message: "No audio file uploaded" });
       }
 
-      const audioPath = `/uploads/${req.file.filename}`; // public URL
+      const audioPath = `/uploads/${req.file.filename}`; // for frontend
+      const fullFilePath = path.join(__dirname, "../../uploads", req.file.filename);
 
       // create feedback with pending status
       let feedback = await Feedback.create({
         user: req.user.userId,
-        audioUrl: audioPath,
+        audioUrl: audioPath, // this is what's used by frontend <audio src>
         status: "pending",
       });
 
-      // Process transcription and sentiment (simple, in-request version)
       try {
-        const transcription = await transcribeAudio(
-          path.join(__dirname, "../../uploads", req.file.filename)
-        );
-
+        const transcription = await transcribeAudio(fullFilePath);
         const sentiment = await analyzeSentiment(transcription);
 
         feedback.transcription = transcription;
@@ -47,13 +44,18 @@ router.post(
         await feedback.save();
       }
 
-      res.status(201).json({ message: "Feedback uploaded", feedbackId: feedback._id });
+      res.status(201).json({
+        message: "Feedback uploaded",
+        feedbackId: feedback._id,
+      });
     } catch (err) {
-      console.error(err);
+      console.error("UPLOAD ERROR:", err);
       res.status(500).json({ message: "Server error" });
     }
   }
 );
+
+
 
 // GET /api/feedback/my  (user: their own feedback)
 router.get("/my", auth("user"), async (req, res) => {
