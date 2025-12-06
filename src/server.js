@@ -32,6 +32,9 @@ app.use(
   })
 );
 
+// Middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));  // <-- ADD THIS
 
 // static file serving for audio files
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
