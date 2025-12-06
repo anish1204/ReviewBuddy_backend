@@ -21,7 +21,24 @@ app.use(
   })
 );
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+const allowedOrigins = [
+  "http://localhost:3000",                      // Local Dev
+  "https://review-buddy-frontend.vercel.app",   // Your Vercel URL (Exact!)
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow no-origin like Postman / local curl
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS: " + origin));
+      }
+    },
+    credentials: true,
+  })
+);
 
 // static file serving for audio files
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
