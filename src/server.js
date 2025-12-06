@@ -13,32 +13,25 @@ const app = express();
 connectDB();
 
 // middlewares
-app.use(express.json());
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    credentials: true,
-  })
-);
-
 const allowedOrigins = [
-  "http://localhost:3000",                      // Local Dev
-  "https://review-buddy-frontend.vercel.app",   // Your Vercel URL (Exact!)
+  "http://localhost:3000",
+  "https://review-buddy-frontend.vercel.app", 
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow no-origin like Postman / local curl
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.log("❌ CORS BLOCKED:", origin);
         callback(new Error("Not allowed by CORS: " + origin));
       }
     },
     credentials: true,
   })
 );
+
 
 // static file serving for audio files
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
