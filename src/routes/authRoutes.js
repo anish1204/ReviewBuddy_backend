@@ -11,7 +11,7 @@ router.post("/register", async (req, res) => {
   try {
     console.log("REGISTER BODY:", req.body); // debug
 
-    let { name, email, password } = req.body;
+    let { name, email, password,role } = req.body;
 
     // Basic sanitize
     name = name?.trim();
@@ -33,7 +33,7 @@ router.post("/register", async (req, res) => {
       name,
       email,
       passwordHash,
-      role: "user",
+      role,
     });
 
     return res.status(201).json({
